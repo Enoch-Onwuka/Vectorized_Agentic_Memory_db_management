@@ -113,6 +113,7 @@ Audit DB	database_weight_history.py	SQLite weight history, snapshots, baselines
 
 <img width="681" height="299" alt="image" src="https://github.com/user-attachments/assets/2f14d9d7-514e-4d74-9a27-ffb00d4c3663" />
 
+
 ⚙️ Installation
 Requirements: Python 3.10+, no broker SDK required for core memory system.
 
@@ -182,6 +183,8 @@ adapter.guardian_close_session(session_id="session_20260601_london")
 memory.execution_layer.adapt_weights(
     memory.episodic_layer.get_performance_data()
 )
+
+
 🔄 Phase System
 ABX gates learning aggressiveness by trade count to prevent overfitting on
 sparse data. Phase boundaries are enforced in UnifiedTradingMemory and
@@ -192,6 +195,7 @@ Phase 1	≤ 50 trades	15 seconds	Conservative — wide guardrails, slow weight d
 Phase 2	51–150 trades	30 seconds	Moderate — balanced adaptation
 Phase 3	150+ trades	60 seconds	Confident — tighter guardrails, full weight range
 Weight bounds apply across all phases: WEIGHT_MIN = 0.10, WEIGHT_MAX = 2.00.
+
 
 🔍 Vector Similarity Search
 VectorStore provides in-process episodic recall without any external vector
@@ -209,6 +213,8 @@ deterministically — no embedding model, no network call, no non-determinism.
 
 # Recall the 5 most similar historical episodes to a current signal
 similar = memory.recall(signal=current_signal, top_k=5)
+
+
 🛡️ Risk Controls Summary
 ABX enforces risk at multiple independent layers — a single misconfigured
 rule cannot bypass all controls.
@@ -221,6 +227,8 @@ Stale position detection	Active	WorkingMemory flags positions past TTL
 Cache TTL (phase-aware)	Active	SemanticCache.set_with_phase()
 Confidence gating	Orchestration	Pre-trade score threshold in UnifiedTradingMemory
 Audit trail	Database	Immutable SQLite weight snapshots, WAL mode
+
+
 🤖 Agent Interface Reference
 ABXMemoryAdapter exposes a dedicated method surface for each agent role,
 keeping agent code decoupled from internal memory topology.
@@ -236,6 +244,7 @@ Herald	News/macro events	store_news_impact(), get_news_profile()
 Chronicle	Trade logging	record_trade(), get_session_summary()
 All agents share a single order_id_map (abx_trade_id → memory_trade_id)
 maintained by the adapter, ensuring consistent trade identity across the stack.
+
 
 📊 Data Models
 Signal
@@ -268,6 +277,8 @@ Trade(
     setup_id="setup_NQ_breakout_v2",
     abx_trade_id="abx_20260601_001",
 )
+
+
 🪵 Logging
 Three concurrent sinks are configured at startup via logger.py:
 
@@ -277,6 +288,7 @@ trading_agent.log	INFO+	Structured text	Operational audit log
 errors.log	ERROR+	JSON	Alerting pipelines / log aggregators
 All sinks use enqueue=True — log writes are non-blocking and will not
 introduce latency into the execution path.
+
 
 🗄️ Audit Trail
 database_weight_history.py maintains a SQLite database with two tables:
@@ -293,6 +305,8 @@ from database_weight_history import WeightHistoryDB
 db = WeightHistoryDB("abx_weights.db")
 db.snapshot_weights(rule_id="breakout_retest", weight=1.45, phase=2)
 history = db.get_weight_history(rule_id="breakout_retest")
+
+
 🧪 Testing Guidance
 ABX's deterministic design makes unit testing straightforward:
 
@@ -304,12 +318,15 @@ Phase detection — assert correct phase assignment at trade counts 0, 50, 51, 1
 Integration tests should instantiate UnifiedTradingMemory end-to-end and
 drive a synthetic session through all six cognitive loop stages.
 
+
 🗺️ Roadmap
  Async-native execution layer for high-frequency signal throughput
  Pluggable vector backend interface (Chroma / Qdrant drop-in)
  REST API wrapper for multi-process agent deployments
  Prometheus metrics exporter for weight drift and phase transitions
  Backtesting harness with deterministic session replay
+
+ 
 📄 License
 MIT License — see LICENSE for full terms.
 
