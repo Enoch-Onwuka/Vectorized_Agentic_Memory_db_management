@@ -211,7 +211,7 @@ ticker or strategy. The store serializes to JSON for persistence and reloads
 deterministically — no embedding model, no network call, no non-determinism.
 
 
-# Recall the 5 most similar historical episodes to a current signal
+#### Recall the 5 most similar historical episodes to a current signal
 similar = memory.recall(signal=current_signal, top_k=5)
 
 
